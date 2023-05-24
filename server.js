@@ -40,7 +40,6 @@ app.post('/books', async (request, response) => {
   try {
     const {title, description, status} = request.body;
     const newBook = await Book.create ({title, description, status});
-
     response.status(201).json(newBook);
   } catch {
     response.status(500).json({error: 'failed to create new book'})
