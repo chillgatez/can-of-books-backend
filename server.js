@@ -39,8 +39,8 @@ app.get('/books', async (request, response) => {
 app.post('/books', async (request, response) => {
   try {
     const {title, description, status} = request.body;
-    const newBook = new Book ({title, description, status});
-    await newBook.save();
+    const newBook = await Book.create ({title, description, status});
+
     response.status(201).json(newBook);
   } catch {
     response.status(500).json({error: 'failed to create new book'})
