@@ -7,7 +7,7 @@ const { Schema } = mongoose;
 const bookSchema = new Schema({
   title: String,
   description: String,
-  status: Boolean,
+  status: String,
 });
 
 //Use your schema to craft a Book model.
