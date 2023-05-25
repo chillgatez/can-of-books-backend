@@ -20,54 +20,72 @@ let DATABASE_URL = 'mongodb://localhost:27017/301'
 const PORT = process.env.PORT || 3001;
 
 // app.get('/test', (request, response) => {
-  
+
 //   response.send('test request received')
-  
+
 // })
 
 app.get('/books', async (request, response) => {
   try {
-   await mongoose.connect(DATABASE_URL);
-    const books = await Book.find(); 
+    await mongoose.connect(DATABASE_URL);
+    const books = await Book.find();
     response.json(books);
   } catch (error) {
-    response.status(500).json({error: 'books not found'});
+    response.status(500).json({ error: 'books not found' });
   }
-  finally {mongoose.disconnect()}
+  finally { mongoose.disconnect() }
 });
 
 app.post('/books', async (request, response) => {
   try {
     await mongoose.connect(DATABASE_URL);
-    const {title, description, status} = request.body;
-    const newBook = await Book.create ({title, description, status});
+    const { title, description, status } = request.body;
+    const newBook = await Book.create({ title, description, status });
     response.status(201).json(newBook);
   } catch {
-    response.status(500).json({error: 'failed to create new book'})
+    response.status(500).json({ error: 'failed to create new book' })
   }
-  finally {mongoose.disconnect()}
+  finally { mongoose.disconnect() }
 });
 
 
-app.delete('/books/:id', async (request, response ) => {
+app.delete('/books/:id', async (request, response) => {
   try {
     await mongoose.connect(DATABASE_URL);
     //finds object by mongoose assigned id data type (objectId)
-    const id  = request.params.id;
+    const id = request.params.id;
 
     //const bookID = mongoose.Types.ObjectId(id)
-    console.log("book Id",id);
+    console.log("book Id", id);
     const deletedBook = await Book.findByIdAndDelete(id);
     if (deletedBook) {
-      response.json ({message: 'book has been deleted'});
+      response.json({ message: 'book has been deleted' });
     } else {
-      response.status(404).json({error: 'book not found'})
+      response.status(404).json({ error: 'book not found' })
     }
   } catch (error) {
-    response.status(500).json({error: 'failed to delete book'});
-  } finally {mongoose.disconnect()}
+    response.status(500).json({ error: 'failed to delete book' });
+  } finally { mongoose.disconnect() }
 });
 
+app.put('/books/:id', async (request, response) => {
+  try {
+    await mongoose.connect(DATABASE_URL);
+    const id = request.params.id;
+    const { title, description, status } = request.body;
+    const updatedBook = await Book.findByIdAndUpdate(id, { title, description, status }, {new: true});
+
+    if (updatedBook) {
+      response.status(201).json({message: 'Book successfully updated.'});
+      } else {
+      response.status(404).json({error: 'Book not found.'});
+    } 
+  } catch (error) {
+      console.error(error);
+      response.status(500).json({error: 'Failed to update book'})
+    }
+     finally { mongoose.disconnect() }
+  });
 
 
 
