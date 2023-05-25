@@ -31,7 +31,7 @@ app.get('/books', async (request, response) => {
     const books = await Book.find(); 
     response.json(books);
   } catch (error) {
-    response.status(404).json({error: 'books not found'});
+    response.status(500).json({error: 'books not found'});
   }
 
 });
@@ -46,5 +46,24 @@ app.post('/books', async (request, response) => {
   }
 
 });
+
+
+app.delete('/books/:id', async (request, response ) => {
+  try {
+    const { id } = request.params;
+    //finds object by mongoose assigned id data type (objectId)
+    const deletedBook = await Book.findByIdAndDelete(mongoose.Types.ObjectId(id));
+    if (deletedBook) {
+      response.json ({message: 'book has been deleted'});
+    } else {
+      response.status(404).json({error: 'book not found'})
+    }
+  } catch (error) {
+    response.status(500).json({error: 'failed to delete book'});
+  }
+});
+
+
+
 
 app.listen(PORT, () => console.log(`listening on ${PORT}`));
