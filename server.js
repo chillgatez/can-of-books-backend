@@ -16,43 +16,48 @@ app.use(express.json());
 
 let DATABASE_URL = 'mongodb://localhost:27017/301'
 
-mongoose.connect(DATABASE_URL);
 
 const PORT = process.env.PORT || 3001;
 
-app.get('/test', (request, response) => {
-
-  response.send('test request received')
-
-})
+// app.get('/test', (request, response) => {
+  
+//   response.send('test request received')
+  
+// })
 
 app.get('/books', async (request, response) => {
   try {
+   await mongoose.connect(DATABASE_URL);
     const books = await Book.find(); 
     response.json(books);
   } catch (error) {
     response.status(500).json({error: 'books not found'});
   }
-
+  finally {mongoose.disconnect()}
 });
 
 app.post('/books', async (request, response) => {
   try {
+    await mongoose.connect(DATABASE_URL);
     const {title, description, status} = request.body;
     const newBook = await Book.create ({title, description, status});
     response.status(201).json(newBook);
   } catch {
     response.status(500).json({error: 'failed to create new book'})
   }
-
+  finally {mongoose.disconnect()}
 });
 
 
 app.delete('/books/:id', async (request, response ) => {
   try {
-    const { id } = request.params;
+    await mongoose.connect(DATABASE_URL);
     //finds object by mongoose assigned id data type (objectId)
-    const deletedBook = await Book.findByIdAndDelete(mongoose.Types.ObjectId(id));
+    const id  = request.params.id;
+
+    //const bookID = mongoose.Types.ObjectId(id)
+    console.log("book Id",id);
+    const deletedBook = await Book.findByIdAndDelete(id);
     if (deletedBook) {
       response.json ({message: 'book has been deleted'});
     } else {
@@ -60,7 +65,7 @@ app.delete('/books/:id', async (request, response ) => {
     }
   } catch (error) {
     response.status(500).json({error: 'failed to delete book'});
-  }
+  } finally {mongoose.disconnect()}
 });
 
 
