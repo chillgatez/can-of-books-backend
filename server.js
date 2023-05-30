@@ -41,7 +41,8 @@ app.post('/books', async (request, response) => {
     await mongoose.connect(DATABASE_URL);
     const { title, description, status } = request.body;
     const newBook = await Book.create({ title, description, status });
-    response.status(201).json(newBook);
+    const books = await Book.find(); //this finds all books so we can send back the new book -cm
+    response.status(201).json(books);
   } catch {
     response.status(500).json({ error: 'failed to create new book' })
   }
