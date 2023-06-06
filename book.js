@@ -8,6 +8,7 @@ const bookSchema = new Schema({
   title: String,
   description: String,
   status: String,
+  userEmail: String,
 });
 
 //Use your schema to craft a Book model.
