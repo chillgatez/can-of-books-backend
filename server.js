@@ -11,8 +11,8 @@ const mongoose = require('mongoose');
 const Book = require('./book');
 // Import the provided authorization middleware
 const { verifyJwt, getUserInfo } = require('./authentication');
-const jwt = require('express-jwt');
-const jwks = require('jwks-rsa');
+// const jwt = require('express-jwt');
+// const jwks = require('jwks-rsa');
 
 app.use(cors());
 app.use(verifyJwt);

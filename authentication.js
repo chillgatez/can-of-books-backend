@@ -1,5 +1,9 @@
-const jwt = require('express-jwt');
+
+
+//aunthentication.js
+
 const jwks = require('jwks-rsa');
+const {expressjwt:jwt} = require('express-jwt');
 const axios = require('axios');
 
 const verifyJwt = jwt({
@@ -17,13 +21,13 @@ const verifyJwt = jwt({
 const getUserInfo = async (request, response, next) => {
   try {
     const accessToken = request.headers.authorization.split(' ')[1];
-    const response = await axios.get('https://dev-m12a6dyw8qu7lgb7.us.auth0.com/userinfo', {
+    const userInfoResponse = await axios.get('https://dev-m12a6dyw8qu7lgb7.us.auth0.com/userinfo', {
       headers: {
         authorization: `Bearer ${accessToken}`
       }
     });
     request.user = {
-        email: response.data,email
+        email: userInfoResponse.data.email
     };
     next();
   } catch (error) {
