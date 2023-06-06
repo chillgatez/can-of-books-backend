@@ -15,13 +15,20 @@ const { verifyJwt, getUserInfo } = require('./authentication');
 // const jwks = require('jwks-rsa');
 
 app.use(cors());
-app.use(verifyJwt);
+// app.use(verifyJwt);
 app.use(getUserInfo);
 //for parsing json data
 app.use(express.json());
 
 let DATABASE_URL = 'mongodb://localhost:27017/301'
 const PORT = process.env.PORT || 3001;
+
+app.use(function (err, req, res, next) {
+  if (err.name === 'UnauthorizedError') {
+    res.status(401).send('Invalid token');
+    console.error('Unauthorized error: ', err.message); // This should give you a more detailed error message
+  }
+});
 
 // app.get('/test', (request, response) => {
 
@@ -33,8 +40,9 @@ app.get('/books', async (request, response) => {
   try {
     await mongoose.connect(DATABASE_URL);
     const userEmail = request.user.email;
+    console.log(userEmail)
     const books = await Book.find({userEmail});
-
+console.log(books)
     response.json(books);
   } catch (error) {
     response.status(500).json({ error: 'books not found' });
@@ -46,6 +54,7 @@ app.post('/books', async (request, response) => {
   try {
     await mongoose.connect(DATABASE_URL);
     const userEmail = request.user.email;
+    
     const { title, description, status } = request.body;
     const newBook = await Book.create({ title, description, status, userEmail });
 
