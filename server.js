@@ -16,14 +16,10 @@ const jwks = require('jwks-rsa');
 app.use(cors());
 app.use(verifyJwt);
 app.use(getUserInfo);
-
 //for parsing json data
 app.use(express.json());
 
-
 let DATABASE_URL = 'mongodb://localhost:27017/301'
-
-
 const PORT = process.env.PORT || 3001;
 
 // app.get('/test', (request, response) => {
@@ -35,8 +31,8 @@ const PORT = process.env.PORT || 3001;
 app.get('/books', async (request, response) => {
   try {
     await mongoose.connect(DATABASE_URL);
-    const userInfo = request.userInfo;
-    const books = await Book.find(userInfo);
+    const userEmail = request.user.email;
+    const books = await Book.find({userEmail});
 
     response.json(books);
   } catch (error) {
@@ -48,9 +44,9 @@ app.get('/books', async (request, response) => {
 app.post('/books', async (request, response) => {
   try {
     await mongoose.connect(DATABASE_URL);
-
+    const userEmail = request.user.email;
     const { title, description, status } = request.body;
-    const newBook = await Book.create({ title, description, status });
+    const newBook = await Book.create({ title, description, status, userEmail });
 
     response.status(201).json(newBook);
   } catch {
@@ -63,10 +59,10 @@ app.post('/books', async (request, response) => {
 app.delete('/books/:id', async (request, response) => {
   try {
     await mongoose.connect(DATABASE_URL);
-
+    const userEmail = request.user.email
     //finds object by mongoose assigned id data type (objectId)
     const id = request.params.id;
-    const deletedBook = await Book.findByIdAndDelete(id);
+    const deletedBook = await Book.findByIdAndDelete({_id: id, userEmail});
 
     if (deletedBook) {
       response.json({ message: 'book has been deleted' });
@@ -81,10 +77,10 @@ app.delete('/books/:id', async (request, response) => {
 app.put('/books/:id', async (request, response) => {
   try {
     await mongoose.connect(DATABASE_URL);
-
+    const userEmail = request.user.email
     const id = request.params.id;
     const { title, description, status } = request.body;
-    const updatedBook = await Book.findByIdAndUpdate({ id }, { title, description, status }, { new: true });
+    const updatedBook = await Book.findByIdAndUpdate({ _id: id, userEmail }, { title, description, status }, { new: true });
 
     if (updatedBook) {
       response.status(201).json({ message: 'Book successfully updated.' });

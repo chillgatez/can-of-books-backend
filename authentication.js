@@ -14,18 +14,20 @@ const verifyJwt = jwt({
   algorithms: ['RS256'],
 });
 
-const getUserInfo = async (req, res, next) => {
+const getUserInfo = async (request, response, next) => {
   try {
-    const accessToken = req.headers.authorization.split(' ')[1];
-    const userResponse = await axios.get('https://dev-m12a6dyw8qu7lgb7.us.auth0.com/userinfo', {
+    const accessToken = request.headers.authorization.split(' ')[1];
+    const response = await axios.get('https://dev-m12a6dyw8qu7lgb7.us.auth0.com/userinfo', {
       headers: {
         authorization: `Bearer ${accessToken}`
       }
     });
-    req.userInfo = userResponse.data;
+    request.user = {
+        email: response.data,email
+    };
     next();
   } catch (error) {
-    return res.status(500).json({ error: 'Failed to fetch user information' });
+    return response.status(500).json({ error: 'Failed to fetch user information' });
   }
 };
 
